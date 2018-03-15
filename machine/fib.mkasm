@@ -1,0 +1,84 @@
+section .text
+sub $4 rsp
+mov $2 rax
+mov $welcome rbx
+mov %welcomesize rcx
+syscall
+call $readint
+mov rbx rax
+call $fib
+mov $4 rax
+syscall
+mov $0 rax
+syscall
+
+
+.fib
+cmp $1 rax
+jl $fibrec
+mov $1 rbx
+ret
+.fibrec
+sub $1 rax
+push rax
+call $fib
+pop rax
+push rbx
+sub $1 rax
+call $fib
+pop rcx
+add rcx rbx
+ret
+
+
+.readint
+push $0
+.readintcycle
+sub $1 rsp
+mov $1 rax
+mov rsp rbx
+mov $1 rcx
+syscall
+movb %rsp rax
+cmp rax $48
+jl $endnum
+cmp rax $57
+jg $endnum
+sub $48 rax
+movb rax %rsp
+mov rbp rax
+sub $4 rax
+mov %rax rbx
+add $1 rbx
+mov rbx %rax
+jmp $readintcycle
+.endnum
+movb $0 %rsp
+add $1 rsp
+mov rbp rax
+sub $4 rax
+mov %rax rcx
+mov $0 %rax
+mov $0 rax
+mov $1 rbx
+.addloop
+cmp rcx $0
+je $endadd
+movb %rsp rax
+mul rbx rax
+push rax
+mov rbp rax
+sub $4 rax
+add %rsp %rax
+pop rax
+sub $1 rcx
+mul $10 rbx
+add $1 rsp
+jmp $addloop
+.endadd
+mov %rsp rbx
+ret
+
+section .bss
+.welcome str "Welcome to the fibonacci counter! Please enter your number: "
+.welcomesize uint 60
